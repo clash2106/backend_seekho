@@ -1,3 +1,1 @@
-
-
-export const DB_NAME="krishnamanocha";
+export const DB_NAME="videotube";
