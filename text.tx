@@ -1,0 +1,23 @@
+package installed:
+
+npm install mongoose-aggregate-paginate-v2
+
+npm install bcrypt
+
+npm install jsonwebtoken
+
+
+
+
+
+
+
+
+
+
+
+
+
+REFRESH TOKEN: Helps keep user logged in without logging in again
+
+ACCESS TOKEN :Proves “user is logged in”
