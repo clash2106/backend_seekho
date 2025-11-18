@@ -106,3 +106,6 @@ userSchema.methods.generateRefreshToken = function (){
 }
 
 export const User = mongoose.model("User",userSchema);
+
+//REFRESH TOKEN: Helps keep user logged in without logging in again
+//ACCESS TOKEN :Proves “user is logged in”
