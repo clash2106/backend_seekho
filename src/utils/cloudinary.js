@@ -8,9 +8,9 @@ import fs from "fs";
 //a built-in core module that provides an API for interacting with the file system
 
 cloudinary.config({ 
-        cloud_name: 'process.env.CLOUDINARY_CLOUD_NAME', 
-        api_key: 'process.env.CLOUDINARY_API_KEY', 
-        api_secret: 'process.env.CLOUDINARY_API_SECRET' // Click 'View API Keys' above to copy your API secret
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+        api_key: process.env.CLOUDINARY_API_KEY, 
+        api_secret: process.env.CLOUDINARY_API_SECRET // Click 'View API Keys' above to copy your API secret
 });
 
 const uploadOnCloudinary =async (localFilePath)=>{
@@ -22,12 +22,18 @@ const uploadOnCloudinary =async (localFilePath)=>{
                 })
                 //file is uploaded successfully
                 console.log("file is uploaded on cloudinary",response.url);
-                conolse.log(response);
-                response.error;
+                // console.log(response);
+                fs.unlinkSync(localFilePath)
                 return response;
         }
         catch(error){
-                fs.unlinkSync(localFilePath) //remove method used to delete a file from your local system when the operation got failed
+        console.log("Cloudinary upload error:", error);
+        try {
+        fs.unlinkSync(localFilePath);
+        } catch (err) {
+        console.log("Error deleting local file after failed upload:", err);
+        }
+         //remove method used to delete a file from your local system when the operation got failed
                 return null;
         }
 }

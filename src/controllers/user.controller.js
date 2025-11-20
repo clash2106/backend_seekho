@@ -1,5 +1,5 @@
 import {asyncHandler} from "../utils/asyncHandler.js"
-import ApiError from "../utils/ApiError.js"
+import {ApiError} from "../utils/ApiError.js"
 import {User} from "../models/user.models.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
@@ -9,7 +9,7 @@ const registerUser = asyncHandler(async (req, res)=>{
     
     //1. get the user detail from the frontend
     const {fullName ,email,userName ,password}=req.body
-    console.log("email:",email);
+    //console.log("email:",email);
     //it will work only if you send all the field in the body
     
     
@@ -22,7 +22,7 @@ const registerUser = asyncHandler(async (req, res)=>{
     )
     ){
         throw new ApiError(400 ,"All fields are required")
-    }or// if(fullName ===""){
+    }// if(fullName ===""){
     //     throw new ApiError(400 ,"fullname is required")
     // }
 
@@ -34,7 +34,7 @@ const registerUser = asyncHandler(async (req, res)=>{
         return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
     }
     if (!email || !isValidEmail(email)) {
-    throw new ApiError("Please enter a valid email");
+    throw new ApiError(400,"Please enter a valid email");
     }
 
 
@@ -42,21 +42,22 @@ const registerUser = asyncHandler(async (req, res)=>{
 
 
     //3. existed user check
-    const existedUser =User.findOne({
+    //always use await because the database is in another continent
+    const existedUser =await User.findOne({
         //this User willa automatically call the mongodb by itself
         $or: [{userName},{email}]
     })
     if(existedUser){
-        throw new ApiError(409 ,"User wuth that email or Username already exists")
+        throw new ApiError(409 ,"User with that email or Username already exists")
     }
 
     //4.  check for images and avatar localPath because of required field
-    const avatarLocalPath = req.files?.avatar[0]?.path;
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
     //avatar is the name that we give in the routes
     //always add optional chaining because it can throw an error also
     //we get  the access of .files from the multer  and the middleware generally add more property tp request
     //example the multermiddleware add a filepath
-    const coverImageLocalPath =req.file?.coverImage[0]?.path;
+    const coverImageLocalPath =req.files?.coverImage?.[0]?.path;
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar file is required")
     }
@@ -67,7 +68,7 @@ const registerUser = asyncHandler(async (req, res)=>{
     const coverImage  =await uploadOnCloudinary(coverImageLocalPath)
     //this step takes time so use await
     if(!avatar){
-        throw new ApiError(400, "Avatar file is required")
+        throw new ApiError(500, "Failed to upload avatar to Cloudinary")
     }
 
 
@@ -86,9 +87,9 @@ const registerUser = asyncHandler(async (req, res)=>{
     //8. check for user creation
     //7. remove password and refresh token fied from response
     const createdUser =await User.findById(user._id ).select(
-        "-password  -refreshToken"
+        "-password -refreshToken"
     )//.select has a wierd syntax of kya nhi chahiye
-    if(createdUser){
+    if(!createdUser){
         throw new ApiError(500,"Something Went wrong while registering the user")
     }
 
