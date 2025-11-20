@@ -2,16 +2,15 @@
 
 //This function takes a requestHandler function as input
 //and returns a new function that wraps the original function in a Promise
- const asyncHandler = (requestHandler) => {
+const asyncHandler = (requestHandler) => {
   //the returned function is a middleware function that takes req, res, next as arguments
-  return (req, res, next) => {
-    Promise.resolve(requestHandler(req, res, next))
-    .catch((err) => next(err));
-  };
+return (req, res, next) => {
+    Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
+};
 };
 //we are accepting a function and returing it back
 
-export {asyncHandler};
+export { asyncHandler };
 
 //as arrow function is a higher order function
 //it takes a function as input and returns a function as output

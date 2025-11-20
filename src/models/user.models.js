@@ -57,10 +57,12 @@ const userSchema = new Schema(
 
 //do not use arrow fucntion here because we need to use this keyword
 //this is a middleware so we have the access to next
+// Pre-save Hook → Hash the password before saving
 userSchema.pre("save", async function(next){
-    if(!this.isMModified("password")) return next();
+    if(!this.isModified("password")) return next();
     //we have to add the if condition otherwise every time user(any change) is updated password will be hashed again
-    this.password = bcrypt.hash(this.password,10);
+    //because it takes time
+    this.password = await bcrypt.hash(this.password,10);
     next();
 })
 
@@ -69,6 +71,8 @@ userSchema.methods.isPasswordCorrect =async function (password){
     //this password is the hashed password stored in db
 }
 
+
+//.sign It is used to create a token by signing some data with a secret key.
 
 userSchema.methods.generateAccessToken = function (){
     return jwt.sign(
